@@ -601,6 +601,28 @@ async function loadCars() {
     let compared = [];
 
     function money(lakh) {
+function money(lakh) {
+  if (lakh == null || !Number.isFinite(lakh)) {
+    return "Not verified";
+  }
+
+  if (lakh >= 100) {
+    return "₹" + (lakh / 100).toFixed(lakh % 100 ? 2 : 0) + " crore";
+  }
+
+  return "₹" + lakh + " lakh";
+}
+
+function showValue(value, unit = "") {
+  if (value == null || value === "" || !Number.isFinite(
+    typeof value === "number" ? value : 1
+  )) {
+    return "Not verified";
+  }
+
+  return String(value) + unit;
+}
+
       if (lakh >= 100) return "₹" + (lakh / 100).toFixed(lakh % 100 ? 2 : 0) + " crore";
       return "₹" + lakh + " lakh";
     }
@@ -616,10 +638,9 @@ async function loadCars() {
         const searchable = [car.make, car.name, car.variant, car.body,
           car.drive, car.fuel, car.engine].join(" ").toLowerCase();
         return (!query || searchable.includes(query)) &&
-          (!budget || car.price <= budget) &&
-          car.hp >= power &&
-          (drive === "all" || car.drive === drive) &&
-          (body === "all" || car.body === body);
+          (!budget || (car.price != null && car.price <= budget)) &&
+(!power || (car.hp != null && car.hp >= power)) &&
+(drive === "all" || car.drive === drive) &&;
       });
 
       $("resultCount").innerHTML =
