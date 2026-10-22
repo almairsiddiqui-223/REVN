@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "lastReviewed": "2026-10-22",
+  "cars": [
+    {
+      "id": "sample-car-001",
+      "make": "REPLACE WITH MAKE",
+      "model": "REPLACE WITH MODEL",
+      "modelYear": 2026,
+      "country": "India",
+      "variant": "REPLACE WITH EXACT VARIANT",
+      "bodyType": "Sedan",
+      "fuelType": "Petrol",
+      "transmission": null,
+      "drivetrain": null,
+      "powerHp": null,
+      "torqueNm": null,
+      "priceINR": null,
+      "specStatus": "unverified",
+      "sources": [
+        {
+          "name": "Official manufacturer specification page",
+          "url": "REPLACE_WITH_REAL_SOURCE_URL",
+          "checkedOn": null
+        }
+      ]
+    }
+  ]
+}
