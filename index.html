@@ -540,17 +540,62 @@
   <script>
     // DEMO DATA ONLY. These records are for testing the interface,
     // not verified specifications or current Indian market prices.
-    const cars = [
-      { id: 1, make: "BMW", name: "M340i", variant: "Performance Sedan · Demo record", price: 75, hp: 369, torque: 500, drive: "AWD", body: "Sedan", fuel: "Petrol", zero: "4.4 s", top: "250 km/h", engine: "3.0L turbo (reference model)", glow: "#44151a" },
-      { id: 2, make: "VOLKSWAGEN", name: "Golf GTI", variant: "Hot Hatch · Demo record", price: 50, hp: 261, torque: 370, drive: "FWD", body: "Hatchback", fuel: "Petrol", zero: "6.0 s", top: "250 km/h", engine: "2.0L turbo (reference model)", glow: "#291d10" },
-      { id: 3, make: "SKODA", name: "Octavia RS", variant: "Performance Sedan · Demo record", price: 50, hp: 261, torque: 370, drive: "FWD", body: "Sedan", fuel: "Petrol", zero: "6.5 s", top: "250 km/h", engine: "2.0L turbo (reference model)", glow: "#17251b" },
-      { id: 4, make: "MAHINDRA", name: "XUV700", variant: "Family SUV · Demo record", price: 25, hp: 197, torque: 380, drive: "FWD", body: "SUV", fuel: "Petrol", zero: "N/A", top: "N/A", engine: "2.0L turbo (reference model)", glow: "#17243b" },
-      { id: 5, make: "HYUNDAI", name: "i20 N Line", variant: "Sporty Hatchback · Demo record", price: 15, hp: 118, torque: 172, drive: "FWD", body: "Hatchback", fuel: "Petrol", zero: "N/A", top: "N/A", engine: "1.0L turbo (reference model)", glow: "#3c1914" },
-      { id: 6, make: "TOYOTA", name: "Fortuner", variant: "Full-size SUV · Demo record", price: 50, hp: 201, torque: 500, drive: "AWD", body: "SUV", fuel: "Diesel", zero: "N/A", top: "N/A", engine: "2.8L diesel (reference model)", glow: "#302315" },
-      { id: 7, make: "PORSCHE", name: "911 Carrera", variant: "Sports Coupe · Demo record", price: 200, hp: 388, torque: 450, drive: "RWD", body: "Coupe", fuel: "Petrol", zero: "4.1 s", top: "294 km/h", engine: "3.0L flat-six (reference model)", glow: "#431017" },
-      { id: 8, make: "BMW", name: "M2", variant: "Performance Coupe · Demo record", price: 110, hp: 473, torque: 600, drive: "RWD", body: "Coupe", fuel: "Petrol", zero: "4.0 s", top: "250 km/h", engine: "3.0L turbo (reference model)", glow: "#252525" },
-      { id: 9, make: "TATA", name: "Nexon", variant: "Compact SUV · Demo record", price: 15, hp: 118, torque: 170, drive: "FWD", body: "SUV", fuel: "Petrol", zero: "N/A", top: "N/A", engine: "1.2L turbo (reference model)", glow: "#152d35" }
-    ];
+
+let cars = [];
+
+const carGlows = [
+  "#44151a",
+  "#17243b",
+  "#17251b",
+  "#3c1914",
+  "#252525"
+];
+
+async function loadCars() {
+  const resultCount = document.getElementById("resultCount");
+  resultCount.textContent = "LOADING VERIFIED CAR DATABASE…";
+
+  try {
+    const response = await fetch("./cars.json");
+
+    if (!response.ok) {
+      throw new Error("Could not load cars.json");
+    }
+
+    const database = await response.json();
+
+    cars = database.cars.map((item, index) => ({
+      id: index + 1,
+      make: item.make,
+      name: item.model,
+      variant: item.variant,
+      price: item.priceINR == null
+        ? null
+        : item.priceINR / 100000,
+      hp: item.powerHp,
+      torque: item.torqueNm,
+      drive: item.drivetrain,
+      body: item.bodyType,
+      fuel: item.fuelType,
+      zero: "Not verified",
+      top: "Not verified",
+      engine: item.engineCC == null
+        ? "Not verified"
+        : item.engineCC + " cc",
+      glow: carGlows[index % carGlows.length],
+      specStatus: item.specStatus,
+      sources: item.sources || []
+    }));
+
+    loadCars();
+  } catch (error) {
+    console.error("REVN database error:", error);
+    resultCount.textContent =
+      "DATABASE ERROR — CHECK cars.json";
+    document.getElementById("carGrid").innerHTML =
+      '<div class="empty">Could not load the database. Check the file name and JSON format.</div>';
+  }
+};
 
     const $ = id => document.getElementById(id);
     let compared = [];
@@ -679,7 +724,7 @@
       $("power").value = "0";
       $("drive").value = "all";
       $("body").value = "all";
-      renderCars();
+      loadCars();
     });
 
     $("carGrid").addEventListener("click", event => {
@@ -698,7 +743,7 @@
         } else {
           compared.push(id);
         }
-        renderCars();
+        loadCars();
       }
     });
 
@@ -706,7 +751,7 @@
       const remove = event.target.closest("[data-remove]");
       if (!remove) return;
       compared = compared.filter(id => id !== Number(remove.dataset.remove));
-      renderCars();
+      loadCars();
     });
 
     $("closeModal").addEventListener("click", () => $("modal").classList.remove("open"));
@@ -718,7 +763,7 @@
     });
 
     $("year").textContent = new Date().getFullYear();
-    renderCars();
+    loadCars();
   </script>
 </body>
 </html>
